@@ -1,19 +1,14 @@
 use rand::distributions::uniform::{UniformFloat};
 
 use super::Class;
+use super::UnitStats;
 
 pub struct Unit {
     pub name: String,
-    // level: i32, // 1+
+    level: u8, // 1+
 
-    /* BASIC STATS (change to array [base, class_p, class_a, item_p, item_a])*/
-    health: i32, // 0 - 10000
-    attack: i32, // 0 - 255
-    defense: i32, // 0 - 255
-    speed: i32, // 0 - 255
-    accuracy: i32, // 0 - 100
-    evasion: i32, // 0 - 100
-    crit: i32, // 0 - 100
+    /* STATS */
+    stats: UnitStats,
 
     /* CLASS DATA */
     pub current_class: Class,
@@ -23,15 +18,34 @@ pub struct Unit {
 
 impl Clone for Unit {
     fn clone(&self) -> Self {
+        let stats_copy = UnitStats::new(
+        self.stats.base_hp(),
+        self.stats.base_sta(),
+        self.stats.base_mana(),
+        self.stats.base_att(),
+        self.stats.base_def(),
+        self.stats.base_mag(),
+        self.stats.base_mdef(),
+        self.stats.base_spd(),
+        self.stats.base_acc(),
+        self.stats.base_eva(),
+        self.stats.base_crit(),
+    );
+
         Self {
             name: self.name.as_str().to_string(),
-            health: self.health,
-            attack: self.attack,
-            defense: self.defense,
-            speed: self.speed,
-            accuracy: self.accuracy,
-            evasion: self.evasion,
-            crit: self.crit,
+            level: self.level,
+
+            stats: stats_copy,
+
+            //health: self.health,
+            //attack: self.attack,
+            //defense: self.defense,
+            //speed: self.speed,
+            //accuracy: self.accuracy,
+            //evasion: self.evasion,
+            //crit: self.crit,
+
             current_class: self.current_class.clone(),
         }
     }
@@ -44,37 +58,42 @@ impl Unit {
 
     pub fn new(
         name: String,
-        health: i32,
-        attack: i32,
-        defense: i32,
-        speed: i32,
-        accuracy: i32,
-        evasion: i32,
-        crit: i32,
+        level: u8,
+
+        hp: u8,
+        stam: u8,
+        mana: u8,
+        att: u8,
+        def: u8,
+        mag: u8,
+        mdef: u8,
+        spd: u8,
+        acc: u8,
+        eva: u8,
+        crit: u8,
     ) -> Self {
         Self {
             name,
-            health,
-            attack,
-            defense,
-            speed,
-            accuracy,
-            evasion,
-            crit,
+            level,
+            stats: UnitStats::new (hp, stam, mana, att, def, mag, mdef, spd, acc, eva, crit),
             current_class: Class::none(),
+        }
+    }
+
+    pub fn new_with_stats(name: String, stats: UnitStats, class: Class) -> Self {
+        Self {
+            name,
+            level: 1u8,
+            stats,
+            current_class: class,
         }
     }
 
     pub fn premade_chase() -> Self {
         Self {
             name: "Chase".to_string(),
-            health: 10i32,
-            attack: 3i32,
-            defense: 1i32,
-            speed: 4i32,
-            accuracy: 7i32,
-            evasion: 2i32,
-            crit: 0i32,
+            level: 1u8,
+            stats: UnitStats::chase_base(),
             current_class: Class::none(),
         }
     }
@@ -82,13 +101,8 @@ impl Unit {
     pub fn premade_ryan() -> Self {
         Self {
             name: "Ryan".to_string(),
-            health: 15i32,
-            attack: 2i32,
-            defense: 2i32,
-            speed: 3i32,
-            accuracy: 8i32,
-            evasion: 1i32,
-            crit: 0i32,
+            level: 1u8,
+            stats: UnitStats::ryan_base(),
             current_class: Class::none(),
         }
     }
@@ -99,71 +113,63 @@ impl Unit {
         self.name.as_str().into()
     }
 
-    pub fn hp(&self) -> i32 {
-        self.health.into()
+    pub fn level(&self) -> u16 {
+        self.level.into()
     }
 
-    pub fn _hp(&mut self, hp: i32) {
-        self.health = hp;
+    pub fn hp(&self) -> u16 {
+        self.stats.hp().into()
     }
 
-    pub fn att(&self) -> i32 {
-        self.attack.into()
+    pub fn sta(&self) -> u16 {
+        self.stats.sta().into()
     }
 
-    pub fn _att(&mut self, att: i32) {
-        self.attack = att;
+    pub fn mana(&self) -> u16 {
+        self.stats.mana().into()
     }
 
-    pub fn def(&self) -> i32 {
-        self.defense.into()
+    pub fn att(&self) -> u16 {
+        self.stats.att().into()
     }
 
-    pub fn _def(&mut self, def: i32) {
-        self.defense = def;
+    pub fn def(&self) -> u16 {
+        self.stats.def().into()
     }
 
-    pub fn spd(&self) -> i32 {
-        self.speed.into()
+    pub fn mag(&self) -> u16 {
+        self.stats.mag().into()
     }
 
-    pub fn _spd(&mut self, spd: i32) {
-        self.speed = spd;
+    pub fn mdef(&self) -> u16 {
+        self.stats.mdef().into()
     }
 
-    pub fn acc(&self) -> i32 {
-        self.accuracy.into()
+    pub fn spd(&self) -> u16 {
+        self.stats.spd().into()
     }
 
-    pub fn _acc(&mut self, acc: i32) {
-        self.accuracy = acc;
+    pub fn acc(&self) -> u16 {
+        self.stats.acc().into()
     }
 
-    pub fn eva(&self) -> i32 {
-        self.evasion.into()
+    pub fn eva(&self) -> u16 {
+        self.stats.eva().into()
     }
 
-    pub fn _eva(&mut self, eva: i32) {
-        self.evasion = eva;
-    }
-
-    pub fn cri(&self) -> i32 {
-        self.crit.into()
-    }
-
-    pub fn _cri(&mut self, cri: i32) {
-        self.crit = cri;
+    pub fn crit(&self) -> u16 {
+        self.stats.crit().into()
     }
 
     /* COMBAT */
 
-    pub fn take_damage(&mut self, dmg: i32) {
-        self.health = self.health - dmg;
+    pub fn take_damage(&mut self, dmg: u16) {
+        self.stats.total[0] = self.stats.total[0] - dmg;
     }
 
-    // hit check
+    // hit check (needs redefining, more robust)
     pub fn hit(&self, attacker: &Unit) -> bool {
-        if attacker.accuracy >= self.evasion {
+        if attacker.stats.acc() >= self.stats.eva() {
             return true
         } else {
             return false
@@ -171,8 +177,8 @@ impl Unit {
     }
 
     pub fn defend(&mut self, attacker: &Unit) {
-        let dmg = if (attacker.attack - self.defense) > 0 {
-            attacker.attack - self.defense
+        let dmg = if (attacker.stats.att() - self.stats.def()) > 0 {
+            attacker.stats.att() - self.stats.def()
         } else {
             0
         };
@@ -188,6 +194,15 @@ impl Unit {
     }
 
     // pub fn switch_class(&mut self, class: Class)
+
+    pub fn compile_passive_mods(&mut self) {
+        // changes to stats
+    }
+
+    pub fn compile_active_mods(&mut self) {
+        // changes to stats
+    }
+
 }
 
 #[cfg(test)]
@@ -197,37 +212,38 @@ mod tests {
     #[test]
     fn test_unit_new() {
         let name = "Chase".to_string();
-        let (health, attack, defense, speed, accuracy, evasion, crit) = (1i32, 1i32, 1i32, 1i32, 5i32, 5i32, 0i32);
-        let unit_chase = Unit::new(name, health, attack, defense, speed, accuracy, evasion, crit);
+        let chase = Unit::new_with_stats(name, UnitStats::chase_base(), Class::none());
 
-        assert_eq!("Chase".to_string(), unit_chase.name);
-        assert_eq!(1i32, unit_chase.health);
-        assert_eq!(1i32, unit_chase.attack);
-        assert_eq!(1i32, unit_chase.defense);
-        assert_eq!(1i32, unit_chase.speed);
-        assert_eq!(5i32, unit_chase.accuracy);
-        assert_eq!(5i32, unit_chase.evasion);
+        assert_eq!("Chase".to_string(), chase.name);
+        assert_eq!(chase.hp(), 10u16);
+        assert_eq!(chase.sta(), 10u16);
+        assert_eq!(chase.mana(), 10u16);
+        assert_eq!(chase.att(), 3u16);
+        assert_eq!(chase.def(), 1u16);
+        assert_eq!(chase.mag(), 4u16);
+        assert_eq!(chase.mdef(), 1u16);
+        assert_eq!(chase.spd(), 4u16);
+        assert_eq!(chase.acc(), 7u16);
+        assert_eq!(chase.eva(), 2u16);
+        assert_eq!(chase.crit(), 0u16);
     }
 
     #[test]
     fn test_take_damage() {
-        let name = "Chase".to_string();
-        let (health, attack, defense, speed, accuracy, evasion, crit) = (5i32, 1i32, 1i32, 1i32, 5i32, 5i32, 0i32);
-        let mut unit_chase = Unit::new(name, health, attack, defense, speed, accuracy, evasion, crit);
-        unit_chase.take_damage(3i32);
+        let mut chase = Unit::new_with_stats("Chase".to_string(), UnitStats::chase_base(), Class::none());
+        chase.take_damage(3u16);
 
-        assert_eq!(unit_chase.health, 2i32);
+        assert_eq!(chase.stats.total[0], 7u16);
     }
 
     #[test]
     fn test_defend() {
-        let name = "Chase".to_string();
-        let (health, attack, defense, speed, accuracy, evasion, crit) = (10i32, 3i32, 2i32, 1i32, 5i32, 5i32, 0i32);
-        let mut unit_chase = Unit::new(name, health, attack, defense, speed, accuracy, evasion, crit);
-        let unit_ryan = Unit::new("Name".to_string(), health, attack, defense, speed, accuracy, evasion, crit);
-        unit_chase.defend(&unit_ryan);
+        let mut chase = Unit::new_with_stats("Chase".to_string(), UnitStats::chase_base(), Class::none());
+        let ryan = Unit::new_with_stats("Ryan".to_string(), UnitStats::ryan_base(), Class::none());
+        let original_hp = chase.stats.total[0];
+        chase.defend(&ryan);
 
-        assert_eq!(unit_chase.health, health - attack + defense);
+        assert_eq!(chase.stats.total[0], original_hp - ryan.stats.total[3] + chase.stats.total[4]);
     }
 
     #[test]
