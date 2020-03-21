@@ -3,7 +3,7 @@ use rand::distributions::uniform::{UniformFloat};
 use super::Class;
 
 pub struct Unit {
-    name: String,
+    pub name: String,
     // level: i32, // 1+
 
     /* BASIC STATS (change to array [base, class_p, class_a, item_p, item_a])*/
@@ -15,21 +15,28 @@ pub struct Unit {
     evasion: i32, // 0 - 100
     crit: i32, // 0 - 100
 
-    /*
-    //
-    health_p: i32,
-    attack_p: i32,
-    defense_p: i32,
-    speed_p: i32,
-    accuracy_p: i32,
-    evasion_p: i32,
-    crit_p: i32,
-    */
-
     /* CLASS DATA */
-    current_class: Class,
+    pub current_class: Class,
     // class_level: Vector<Array<String>, Array<i32>>, // class.name, level <-(write to when added)
 }
+
+
+impl Clone for Unit {
+    fn clone(&self) -> Self {
+        Self {
+            name: self.name.as_str().to_string(),
+            health: self.health,
+            attack: self.attack,
+            defense: self.defense,
+            speed: self.speed,
+            accuracy: self.accuracy,
+            evasion: self.evasion,
+            crit: self.crit,
+            current_class: self.current_class.clone(),
+        }
+    }
+}
+
 
 impl Unit {
 
@@ -88,32 +95,64 @@ impl Unit {
 
     /* VISBILITY */
 
-    pub fn name(self) -> String {
-        self.name.into()
+    pub fn name(&self) -> String {
+        self.name.as_str().into()
     }
 
-    pub fn hp(self) -> i32 {
+    pub fn hp(&self) -> i32 {
         self.health.into()
     }
 
-    pub fn att(self) -> i32 {
+    pub fn _hp(&mut self, hp: i32) {
+        self.health = hp;
+    }
+
+    pub fn att(&self) -> i32 {
         self.attack.into()
     }
 
-    pub fn def(self) -> i32 {
+    pub fn _att(&mut self, att: i32) {
+        self.attack = att;
+    }
+
+    pub fn def(&self) -> i32 {
         self.defense.into()
     }
 
-    pub fn spd(self) -> i32 {
+    pub fn _def(&mut self, def: i32) {
+        self.defense = def;
+    }
+
+    pub fn spd(&self) -> i32 {
         self.speed.into()
     }
 
-    pub fn acc(self) -> i32 {
+    pub fn _spd(&mut self, spd: i32) {
+        self.speed = spd;
+    }
+
+    pub fn acc(&self) -> i32 {
         self.accuracy.into()
     }
 
-    pub fn eva(self) -> i32 {
+    pub fn _acc(&mut self, acc: i32) {
+        self.accuracy = acc;
+    }
+
+    pub fn eva(&self) -> i32 {
         self.evasion.into()
+    }
+
+    pub fn _eva(&mut self, eva: i32) {
+        self.evasion = eva;
+    }
+
+    pub fn cri(&self) -> i32 {
+        self.crit.into()
+    }
+
+    pub fn _cri(&mut self, cri: i32) {
+        self.crit = cri;
     }
 
     /* COMBAT */
@@ -142,6 +181,13 @@ impl Unit {
     }
 
     /* CLASS FUNCTIONS */
+
+    // eventually allow adding but not changing current class
+    pub fn add_class(&mut self, class: Class) {
+        self.current_class = class;
+    }
+
+    // pub fn switch_class(&mut self, class: Class)
 }
 
 #[cfg(test)]
@@ -188,9 +234,16 @@ mod tests {
     fn test_hit() {
         let chase = Unit::premade_chase();
         let ryan = Unit::premade_ryan();
-
         let land = chase.hit(&ryan);
-
         assert_eq!(land, true)
+    }
+
+    #[test]
+    fn test_unit_add_class() {
+        let mut chase = Unit::premade_chase();
+        assert_eq!(chase.current_class.name, "None".to_string());
+
+        chase.add_class(Class::make_ranger());
+        assert_eq!(chase.current_class.name, "Ranger".to_string());
     }
 }

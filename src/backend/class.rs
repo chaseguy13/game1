@@ -1,7 +1,9 @@
 use std::vec::Vec;
 
+use super::Unit;
+
 pub struct Class {
-    name: String,
+    pub name: String,
     level: i32, // 0 - 50
 
     modifiers: Vec<[i32; 2]>,
@@ -18,6 +20,25 @@ DEFAULT CLASSES:
 - Warrior
 - Tank
 */
+
+
+impl Clone for Class {
+    fn clone(&self) -> Self {
+        let mut cloned_mod = vec![[0, 0]; self.modifiers.len()];
+
+        for i in 0..(self.modifiers.len()) {
+            cloned_mod[i][0] = self.modifiers[i][0];
+            cloned_mod[i][1] = self.modifiers[i][1];
+        };
+
+        Self {
+        name: self.name.as_str().to_string(),
+        level: self.level,
+        modifiers: cloned_mod,
+        }
+    }
+}
+
 
 impl Class {
     /* CONSTRUCTORS */
@@ -87,8 +108,8 @@ impl Class {
         }
     }
 
-    fn ranger1(&self) {
-        
+    fn ranger_mod_1(&self, unit: &mut Unit) {
+        unit._acc(3i32 * unit.acc() / 2i32);
     }
 
 }
@@ -109,13 +130,38 @@ mod tests {
         assert_eq!(ranger.name, "Ranger".to_string());
         assert_eq!(ranger.level, 1i32);
 
-        println!("{}", ranger.modifiers.len());
-
         assert_eq!(ranger.modifiers[0][0], 1i32);
         assert_eq!(ranger.modifiers[0][1], 1i32);
         assert_eq!(ranger.modifiers[1][0], 5i32);
         assert_eq!(ranger.modifiers[1][1], 1i32);
         assert_eq!(ranger.modifiers[2][0], 10i32);
         assert_eq!(ranger.modifiers[2][1], 1i32);
+    }
+
+    #[test]
+    fn test_class_clone() {
+        let ranger = Class::make_ranger();
+        let ranger_clone = ranger.clone();
+
+        assert_eq!(ranger.modifiers[0][0], ranger_clone.modifiers[0][0]);
+        assert_eq!(ranger.modifiers[0][1], ranger_clone.modifiers[0][1]);
+        assert_eq!(ranger.modifiers[1][0], ranger_clone.modifiers[1][0]);
+        assert_eq!(ranger.modifiers[1][1], ranger_clone.modifiers[1][1]);
+        assert_eq!(ranger.modifiers[2][0], ranger_clone.modifiers[2][0]);
+        assert_eq!(ranger.modifiers[2][1], ranger_clone.modifiers[2][1]);
+    }
+
+    #[test]
+    fn test_ranger_mod_1() {
+        let mut chase = Unit::premade_chase();
+        assert_eq!(chase.acc(), 7i32);
+
+        chase.add_class(Class::make_ranger());
+
+        /*
+        let mut chase_clone = chase.clone();
+        chase.current_class.ranger_mod_1(&mut chase_clone);
+        assert_eq!(chase_clone.acc(), 10i32);
+        */
     }
 }
