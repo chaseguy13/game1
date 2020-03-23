@@ -3,9 +3,9 @@
 #![allow(dead_code)]
 #![allow(unused)]
 
-mod backend;
+mod level2;
 
-use backend::Unit;
+use level2::{Unit};
 
 pub struct Game {
     unit_1: Unit,

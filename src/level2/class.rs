@@ -6,6 +6,7 @@ pub struct Class {
     pub name: String,
     level: u8, // 0 - 50
 
+    // needs restructuring for new stats type
     modifiers: Vec<(u8, bool)>,
 }
 
@@ -99,13 +100,19 @@ impl Class {
     }
 
     /* RANGER MODS */
-    pub fn ranger_passives(&self) {
-        // output signal to change stat_b of unit
 
-        for index in 0..(self.modifiers.len() - 1) {
 
-        }
+    /* all passive mod functions must follow this structure:
+
+    pub fn name(&self, stats: [u8; 11]) -> [f32; 11] {
+        // will check class level and convert stat array by multiplying* index if level passes
+
+        // also check for surpassing stats
     }
+
+    all mod functions will then be compiled into a passive vector by a higher fn and used by unit
+    */
+
 }
 
 #[cfg(test)]
