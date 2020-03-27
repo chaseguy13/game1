@@ -20,7 +20,7 @@ impl Unsigned for u8 {}
 impl Unsigned for u16 {}
 
 pub struct Stats<T: Unsigned> {
-    health: T,
+    health: u16,
     stamina: T,
     mana: T,
 
@@ -47,7 +47,7 @@ setters
 impl Stats<u8> {
     pub fn base() -> Self {
         Self {
-            health: 10u8,
+            health: 10u16,
             stamina: 10u8,
             mana: 10u8,
             attack: 1u8,
@@ -63,7 +63,7 @@ impl Stats<u8> {
 
     pub fn base_chase() -> Self {
         Self {
-            health: 10u8,
+            health: 10u16,
             stamina: 10u8,
             mana: 10u8,
             attack: 3u8,
@@ -79,7 +79,7 @@ impl Stats<u8> {
 
     pub fn base_ryan() -> Self {
         Self {
-            health: 10u8,
+            health: 10u16,
             stamina: 10u8,
             mana: 10u8,
             attack: 2u8,
@@ -97,7 +97,7 @@ impl Stats<u8> {
 impl<T: Unsigned> Stats<T> where T: Copy, {
 
     pub fn new(
-        health: T,
+        health: u16,
         stamina: T,
         mana: T,
         attack: T,
@@ -126,7 +126,7 @@ impl<T: Unsigned> Stats<T> where T: Copy, {
 
     /* GETTERS */
 
-    pub fn get_hp(&self) -> T {
+    pub fn get_hp(&self) -> u16 {
         return self.health.into()
     }
 
@@ -172,7 +172,7 @@ impl<T: Unsigned> Stats<T> where T: Copy, {
 
     /* SETTERS */
 
-    pub fn set_hp(&mut self, val: T) {
+    pub fn set_hp(&mut self, val: u16) {
         self.health = val;
     }
 
@@ -226,17 +226,17 @@ mod tests {
     fn test_getter() {
         let stats8 = Stats::base();
         let hp = stats8.get_hp();
-        assert_eq!(hp, 10u8);
+        assert_eq!(hp, 10u16);
     }
 
     #[test]
     fn test_setter() {
         let mut stats8 = Stats::base();
         let mut hp = stats8.get_hp();
-        assert_eq!(hp, 10u8);
+        assert_eq!(hp, 10u16);
 
-        stats8.set_hp(8u8);
+        stats8.set_hp(8u16);
         hp = stats8.get_hp();
-        assert_eq!(hp, 8u8);
+        assert_eq!(hp, 8u16);
     }
 }
